@@ -1,0 +1,176 @@
+#!/bin/zsh
+
+
+#author: Bernard Mc Keever (dregin), 2004
+#realease: 2.0a
+#notes: Lots of help from Charlie Von Metzradt (phaxx), a new (faster) version in C is on the way.
+
+
+success=0
+logon=`whoami`
+time=`date`
+#echo -e "$logon" "\t\t" " *** "  "\t" "$time"  >> ~dregin/.dregmap-user-log
+#printf "%-9s *** %s\n" "$logon" "$time" >> ~dregin/.dregmap-user-log
+filename=~dregin/ipnames.txt
+log=~dregin/.dregmap-user-log
+#if [ $logon = "goldfish" ]; then
+#	echo "GET A HAIRCUT!"
+#	echo
+#	#exit 0
+#fi
+if [ -n "$1" ]; then
+	if [ "$1" = "-c" ]; then
+		number=`grep -c "$logon" "$log"`
+		printf "You've used Dregmap %s times since I bothered to clear the log." "$number"
+                echo
+                echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+		  echo "\033[40m\033[31mfinger dregin for new usage info.\033[0m" #Red
+                exit 0
+	fi
+
+	if [ "$1" = "-a" ]; then
+		echo "From Minerva:"
+		ssh dregin@minerva ~dregin/dregmap
+
+                echo "From Murphy:"
+                ssh dregin@murphy ~dregin/dregmap
+
+                echo "From Carbon:"
+                ssh dregin@carbon ~dregin/dregmap
+
+                echo "From Deathray:"
+                ssh dregin@deathray ~dregin/dregmap
+
+
+		exit 0
+	fi
+
+	if [ "$1" = "-cu" ]; then
+		number=`grep -c "$2" "$log"`
+                printf "%s has used Dregmap %s times since I bothered to clear the log." "$2" "$number"
+                echo
+                echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+		  echo "\033[40m\033[31mfinger dregin for new usage info.\033[0m" #Red
+                exit 0
+	fi
+
+	if [ "$1" = "-i" ]; then
+		if [ "$2" = "" ]; then
+			printf "%s needs to check that IP again (or bother to fuckin put one in (OR GET SOME FUCKING SKILLS))" "$logon"
+                	echo
+                	echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+                	exit 0
+		else
+			last|grep "$2"
+                	echo
+                	echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+                	exit 0
+		fi
+	fi
+
+	if [ "$1" = "-iu" ]; then
+		if [ "$2" = "" ]; then
+			printf "Put in a fuckin username ta FUCK"
+                	echo
+                	echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+                	exit 0
+		else
+			ip=`/usr/bin/who | grep $2 | head -1 | awk '{print $5}' | sed "s/[\(\)]//g"`
+			if [ -n "$ip" ]; then
+				room=`grep "$ip" "$filename" | awk '{print $1}' | head -1`
+				printf "The computer is: %s\n" "$room"
+				printf "The Redbrick users to login from this machine in the last month were:\n"
+				echo
+				last|grep "$ip" | awk '{print $1,$4,$5,$6,$7,$8,$9}'
+                		echo
+                		echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+                		exit 0
+			else
+				ip=`last -a -1 $2 | awk '{print $10}' | sed "s/[\(\)]//g" | sed "s/:S\.\([0-9]*\)//"`
+				room=`grep "$ip" "$filename" | awk '{print $1}' | head -1`
+				printf "The computer is: %s\n" "$room"
+				printf "The Redbrick users to login from this machine in the last month were:\n"
+				echo
+				if [ "$ip" != "" ]; then
+					last|grep "$ip" | awk '{print $1,$4,$5,$6,$7,$8,$9}'
+				fi
+			fi
+		fi
+		exit 0
+	fi
+
+	ip=`/usr/bin/who | grep $1 | head -1 | awk '{print $5}' | sed "s/[\(\)]//g" | sed "s/:S\.\([0-9]*\)//" | sed "s/136\.206\.218\.\([0-9]*\)/cawireless/" | sed "s/136\.206\.1\.\([0-9]*\)/res/" | sed "s/136\.206\.240\.\([0-9]*\)/res/" | sed "s/136\.206\.252\.\([0-9]*\)/res/" | sed "s/136\.206\.45\.\([0-9]*\)/clubsandsocs/" | sed "s/136\.206\.249\.\([0-9]*\)/Canteen_Wireless/" | sed "s/136\.206\.251\.\([0-9]*\)/Venue/" | sed "s/136\.206\.249\.\([0-9]*\)/gameslan/"`
+	if [ -n "$ip" ]; then									
+                room=`grep "$ip" "$filename" | awk '{print $1}' | head -1`
+                if [ "$room" != "" ]; then
+			printf "%-9s is in %s\n" "$1" "$room"
+			ca_check=`echo "$room" | grep "L"`
+
+			if [ "$ca_check" != "" ]; then
+				name="$1"
+				time_output=`date +%H:%M`
+				time_check=`date +%H`
+				whois=`whoami`
+				echo -n "Press y to run shadow map on this fuckwit "
+				read optMap
+				echo "$time_hourCheck"
+				if [[ $optMap == "y" || $optMap == "Y" ]]; then
+					if [[ $time_check -gt 23 || $time_check -lt 7 ]]; then
+						printf "%s must be an awful bollox if they think the labs are open at %s\n" "$whois" "$time_output"
+						echo
+						echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+						echo "\033[40m\033[31mfinger dregin for new usage info.\033[0m" #Red
+						exit 0
+					fi
+					~shadow/map "$name"
+				fi
+		fi			
+
+       fi
+
+	echo
+	echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+
+	else
+		ip=`last -a -1 $1 | awk '{print $10}' | sed "s/[\(\)]//g" | sed "s/:S\.\([0-9]*\)//" | sed "s/136\.206\.218\.\([0-9]*\)/cawireless/" | sed "s/136\.206\.1\.\([0-9]*\)/res/" | sed "s/136\.206\.240\.\([0-9]*\)/res/" | sed "s/136\.206\.252\.\([0-9]*\)/res/" | sed "s/136\.206\.45\.\([0-9]*\)/clubsandsocs/" | sed "s/136\.206\.1\.\([0-9]*\)/res/" | sed "s/136\.206\.24\.\([0-9]*\)/res/" | sed "s/136\.206\.252\.\([0-9]*\)/res/" | sed "s/136\.206\.45\.\([0-9]*\)/clubsandsocs/" | sed "s/136\.206\.249\.\([0-9]*\)/Canteen_Wireless/" | sed "s/136\.206\.251\.\([0-9]*\)/Venue/" | sed "s/136\.206\.249\.\([0-9]*\)/gameslan/"`
+		room=`grep "$ip" "$filename" | awk '{print $1}' | head -1`
+
+		echo "$1 is not logged in at the moment."
+
+		if [ "$room" != "" ]; then
+			echo "$1's last Redbrick login was from $room."
+			echo
+			echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+			echo "\033[40m\033[31mfinger dregin for new usage info.\033[0m" #Red
+		else
+			echo
+			echo "\033[1;34mDregmap V 2.0 alpha\033"          #blue
+			echo "\033[40m\033[31mfinger dregin for new usage info.\033[0m" #Red
+		fi
+
+
+		
+	fi
+exit 0
+fi
+
+for name in `cat ~/.friends`;
+do
+
+
+	ip=`/usr/bin/who | grep $name | head -1 | awk '{print $5}' | sed "s/[\(\)]//g" | sed "s/:S\.\([0-9]*\)//" | 
+sed "s/136\.206\.218\.\([0-9]*\)/cawireless/" | sed "s/136\.206\.1\.\([0-9]*\)/res/" | sed "s/136\.206\.240\.\([0-9]*\)/res/" | sed "s/136\.206\.252\.\([0-9]*\)/res/" | sed "s/136\.206\.45\.\([0-9]*\)/clubsandsocs/" | sed "s/136\.206\.1\.\([0-9]*\)/res/" | sed "s/136\.206\.24\.\([0-9]*\)/res/" | sed "s/136\.206\.252\.\([0-9]*\)/res/" | sed "s/136\.206\.45\.\([0-9]*\)/clubsandsocs/" | sed "s/136\.206\.249\.\([0-9]*\)/Canteen_Wireless/" | sed "s/136\.206\.251\.\([0-9]*\)/Venue/"| sed "s/136\.206\.249\.\([0-9]*\)/gameslan/"`
+	if [ -n "$ip" ]; then										
+		room=`grep "$ip" "$filename" | awk '{print $1}' | head -1`							
+		if [ "$room" != "" ]; then
+			printf "%-9s is in %s\n" "$name" "$room"
+		fi
+	fi
+
+done
+
+echo
+echo "\033[1;34mDregmap V 2.0 alpha\033[0m" 		#blue
+echo "\033[40m\033[31mfinger dregin for new usage info.\033[0m" #Red
+
+exit 0
